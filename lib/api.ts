@@ -70,3 +70,46 @@ export async function checkHealth(): Promise<boolean> {
     return false;
   }
 }
+
+// ======================
+// 🔐 AUTENTICACIÓN
+// ======================
+
+// Registrar usuario
+export async function registerUser(email: string, password: string, username: string) {
+  const response = await fetch(`${API_BASE_URL}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password, username }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.error || 'Error al registrar usuario');
+  }
+
+  return data;
+}
+
+// Iniciar sesión
+export async function loginUser(email: string, password: string) {
+  const response = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.error || 'Error al iniciar sesión');
+  }
+
+  // Guardar token temporalmente (puedes migrar a cookies o Supabase client más adelante)
+  if (data.token) {
+    localStorage.setItem('flightquest_token', data.token);
+  }
+
+  return data;
+}
